@@ -93,3 +93,17 @@ Added a **Sign In Screen** for the Xiaomi Shopping App. Implementing the functio
 # Updates: added Localization
 ### I used the package "easy_localization" to add localization to my app
 added a language button on the app bar which opens a dialog to choose between languages to apply to the app
+
+
+# Updates: added Firebase Authentication
+### Sign in and Sign up are now functioning
+added a sign in page tht takes the user to the homepage after signing in and a button to sign up if the user is new
+
+### Screenshots
+<img src="r4-image.png" alt="Light Theme" height="150">
+<img src="r5-image.png" alt="Light Theme" height="400">
+
+
+<br>
+<br>
+Planning to work on the UI design and colors

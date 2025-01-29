@@ -4,20 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shop_app/home_page.dart';
 import 'package:shop_app/lang_dialog.dart';
-import 'package:shop_app/sign_up.dart';
+import 'package:shop_app/sign_in.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> SignInFormKey = GlobalKey<FormState>();
 
+  TextEditingController FullNameController = TextEditingController();
   TextEditingController EmailController = TextEditingController();
   TextEditingController PasswordController = TextEditingController();
+  TextEditingController CheckPasswordController = TextEditingController();
 
   bool hidePassword = true;
   void switchVisibility() {
@@ -79,7 +81,24 @@ class _SignInScreenState extends State<SignInScreen> {
                   // Image.asset(""),
                   Icon(Icons.shopify_sharp, size: 100),
                   const SizedBox(height: 30),
-
+                  TextFormField(
+                    controller: FullNameController,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                      labelText: context.tr("full_name"),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your full name';
+                      }
+                      // check if the first letter is uppercase or not
+                      else if (value[0] != value[0].toUpperCase()) {
+                        return 'Please make sure the first letter is capitalized';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: EmailController,
@@ -124,35 +143,59 @@ class _SignInScreenState extends State<SignInScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-
+                  TextFormField(
+                    controller: CheckPasswordController,
+                    obscureText: hidePassword,
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.lock_outlined),
+                        border: OutlineInputBorder(),
+                        labelText: context.tr("confirm_password"),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            switchVisibility();
+                            setState(() {});
+                          },
+                          icon: Icon(hidePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                        )),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      } else if (value != PasswordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                       onPressed: () async {
                         try {
                           final credential = await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
+                              .createUserWithEmailAndPassword(
                             email: EmailController.text,
                             password: PasswordController.text,
                           );
-                          if (credential == null) {
-                            print("credential is null");
-                          }
                         } on FirebaseAuthException catch (e) {
-                          if (e.code == 'user-not-found') {
-                            print('No user found for that email.');
-                          } else if (e.code == 'wrong-password') {
-                            print('Wrong password provided for that user.');
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      "Check your input errors and try again")),
-                            );
+                          if (e.code == 'weak-password') {
+                            print('The password provided is too weak.');
+                          } else if (e.code == 'email-already-in-use') {
+                            print('The account already exists for that email.');
                           }
+                        } catch (e) {
+                          print(e);
                         }
-
                         if (SignInFormKey.currentState!.validate()) {
-                          successDialog();
+                          // successDialog();
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              type: PageTransitionType.leftToRight,
+                              duration: Durations.extralong2,
+                              child: const MyHomePage(),
+                            ),
+                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -161,21 +204,21 @@ class _SignInScreenState extends State<SignInScreen> {
                           );
                         }
                       },
-                      child: Text(context.tr("sign_in"))),
+                      child: Text(context.tr("sign_up"))),
                   const SizedBox(height: 10),
                   TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         PageTransition(
-                          type: PageTransitionType.rightToLeft,
+                          type: PageTransitionType.leftToRight,
                           duration: Durations.extralong2,
-                          child: const SignUpScreen(),
+                          child: const SignInScreen(),
                         ),
                       );
                     },
                     child: Text(
-                      context.tr("sign_up"),
+                      context.tr("sign_in"),
                     ),
                   ),
                 ],

@@ -1,6 +1,7 @@
 {
     "select_language": "Select Language",
     "sign_in": "Sign in",
+    "sign_up": "Sign up",
     "email": "Email",
     "password": "Password",
     "confirm_password": "Confirm Password",
